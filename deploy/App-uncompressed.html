@@ -180,7 +180,7 @@ Ext.define('Boost.rally.PrintGrid', {
                 scope: self
             }]
         });
-
+        
         var fieldsWindow = Ext.create('widget.window', {
             title: 'Print options',
             layout: 'fit',
@@ -220,13 +220,13 @@ Ext.define('Boost.rally.PrintGrid', {
             '<span class="ownerText {[this.hideElements(\'owner\')]}">{owner}</span>',
             '</div>',
             '<tpl if="this.hideElements(estimate)">',
-            '<div class="estimate {[this.hideElements(\'estimate\')]}">Size: {estimate}</div>',
+            '<div class="estimate {[this.hideElements(\'estimate\')]} {type}">{estimate}</div>',
             '</tpl>',
             '<div class="content">',
-            '<span class="card-title {[this.hideElements(\'name\')]}">{name}</span>',
-            '<span class="description {[this.hideElements(\'description\')]}">{description}</span>',
+            '<div class="card-title {[this.hideElements(\'name\')]}">{name}</div>',
+            '<div class="description {[this.hideElements(\'description\')]}">{description}</div>',
             '</div>',
-            '<span class="rank {[this.hideElements(\'rank\')]}">Rank: {#}</span>',
+            '<span class="rank {[this.hideElements(\'rank\')]}">#{#}</span>',
             '</div>',
             '</div>',
             '</div>',
@@ -252,7 +252,8 @@ Ext.define('Boost.rally.PrintGrid', {
     }),
     
     _sanitizeData: (function(selections) {
-        var data = {
+        var self = this;
+        data = {
             artifacts: []
         };
 
@@ -261,14 +262,17 @@ Ext.define('Boost.rally.PrintGrid', {
                 name: selection.get('Name'),
                 description: selection.get('Description'),
                 id: selection.get('FormattedID'),
-                estimate: selection.get('PlanEstimate'),
                 type: selection.get('_type')
             };
+            
+            if (selection.get('PlanEstimate')) {
+                obj['estimate'] = selection.get('PlanEstimate');
+            }
 
             if (selection.get('Owner')) {
                 obj['owner'] = selection.get('Owner')['_refObjectName'];
             }
-
+            
             data.artifacts.push(obj);
         });
 
