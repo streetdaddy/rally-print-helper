@@ -171,7 +171,7 @@ Ext.define('Boost.rally.PrintGrid', {
                 scope: self
             }]
         });
-
+        
         var fieldsWindow = Ext.create('widget.window', {
             title: 'Print options',
             layout: 'fit',
