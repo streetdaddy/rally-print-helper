@@ -16,11 +16,13 @@ Ext.define('Boost.rally.PrintGrid', {
     extend: 'Ext.grid.Panel',
     alias: 'widget.printgrid',
     title: 'Print Grid',
+    remoteHost: 'rally1.rallydev.com',
     columnLines: true,
     border: false,
     emptyText: 'No records found',
     hideIteration: false,
     styleSheetPath: 'print.css',
+    printTitle: 'Work Item Printer',
     remote: false,
     initComponent: function() {
         var self = this,
@@ -37,11 +39,9 @@ Ext.define('Boost.rally.PrintGrid', {
 
     _setRemote: (function() {
         var self = this,
-            url = window.location.origin,
-            expression = /[\-a-zA-Z0-9@:%_\+.~#?&\/\/=]{2,256}\.[a-z]{2,4}\b(\/[\-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)?/gi,
-            regex = new RegExp(expression);
+            url = window.location.origin;
 
-        if (url.match(regex)) {
+        if (url.indexOf(this.remoteHost) >= 0) {
             self.remote = true;
         }
     }),
@@ -55,7 +55,7 @@ Ext.define('Boost.rally.PrintGrid', {
             flex: 1,
             sortable: false
         }, {
-            text: 'Story Name',
+            text: 'Work Item Name',
             dataIndex: 'Name',
             flex: 3,
             sortable: false
@@ -199,24 +199,25 @@ Ext.define('Boost.rally.PrintGrid', {
             data = self._sanitizeData(selections),
             fieldsForm = self.fieldsForm,
             formValues = fieldsForm.getValues();
+            console.log();
 
         var tpl = new Ext.XTemplate(
             '<tpl for="artifacts">',
             '<div class="artifact">',
             '<div class="ratio-control">',
             '<div class="card-frame">',
-            '<div class="header">',
+            '<div class="header {type}">',
             '<span class="storyID {[this.hideElements(\'id\')]}">{id}</span>',
             '<span class="ownerText {[this.hideElements(\'owner\')]}">{owner}</span>',
             '</div>',
-            '<div class="content">',
-            '<span class="card-title {[this.hideElements(\'name\')]}">{name}</span>',
-            '<span class="description {[this.hideElements(\'description\')]}">{description}</span>',
-            '</div>',
             '<tpl if="this.hideElements(estimate)">',
-            '<span class="estimate {[this.hideElements(\'estimate\')]}">Size: {estimate}</span>',
+            '<div class="estimate {[this.hideElements(\'estimate\')]} {type}">{estimate}</div>',
             '</tpl>',
-            '<span class="rank {[this.hideElements(\'rank\')]}">Rank: {#}</span>',
+            '<div class="content">',
+            '<div class="card-title {[this.hideElements(\'name\')]}">{name}</div>',
+            '<div class="description {[this.hideElements(\'description\')]}">{description}</div>',
+            '</div>',
+            '<span class="rank {[this.hideElements(\'rank\')]}">#{#}</span>',
             '</div>',
             '</div>',
             '</div>',
@@ -224,7 +225,9 @@ Ext.define('Boost.rally.PrintGrid', {
             '</tpl>', {
                 compiled: true,
                 hideElements: (function(element, field) {
-                    return !!formValues['iteration-' + element] ? '' : 'hidden';
+                    // var val = formValues['iteration-' + element];
+                    return formValues['iteration-' + element] ? '' : 'hidden';
+                    // return (!!val && val != null) ? '' : 'hidden';
                 })
             }
         );
@@ -240,7 +243,8 @@ Ext.define('Boost.rally.PrintGrid', {
     }),
     
     _sanitizeData: (function(selections) {
-        var data = {
+        var self = this;
+        data = {
             artifacts: []
         };
 
@@ -249,13 +253,17 @@ Ext.define('Boost.rally.PrintGrid', {
                 name: selection.get('Name'),
                 description: selection.get('Description'),
                 id: selection.get('FormattedID'),
-                estimate: selection.get('PlanEstimate')
+                type: selection.get('_type')
             };
+            
+            if (selection.get('PlanEstimate')) {
+                obj['estimate'] = selection.get('PlanEstimate');
+            }
 
             if (selection.get('Owner')) {
                 obj['owner'] = selection.get('Owner')['_refObjectName'];
             }
-
+            
             data.artifacts.push(obj);
         });
 
@@ -283,15 +291,16 @@ Ext.define('Boost.rally.PrintGrid', {
         var self = this,
             options = 'toolbar=1,menubar=1,scrollbars=yes,scrolling=yes,resizable=yes,width=1000,height=500',
             win = window.open('', self.printTitle, options),
+            // win = window.open('', '_blank', options),
             doc = win.document;
 
         doc.write('<html><head><title>' + self.printTitle + '</title>');
 
         if (self.remote) {
-            doc.write('<link href=https://raw.github.com/boost/rally-print-helper/master/print.css rel="stylesheet" type="text/css" media="screen,print" />');
+            doc.write('<link href="https://cdn.rawgit.com/streetdaddy/rally-print-helper/master/print.css" rel="stylesheet" type="text/css" media="screen,print" />');
         }
         else {
-            doc.write('<link href="' + self.styleSheetPath + '" rel="stylesheet" type="text/css" media="screen,print" />');
+            doc.write('<link href="' + self.styleSheetPath + '?' + Date.now() + '" rel="stylesheet" type="text/css" media="screen,print" />');
         }
 
         doc.write('</head><body class="landscape">');
@@ -300,7 +309,7 @@ Ext.define('Boost.rally.PrintGrid', {
         doc.close();
 
         win.focus();
-        win.print();
+        // win.print();
         return false;
     })
 });
@@ -353,25 +362,14 @@ Ext.define('CustomApp', {
         });
 
         // Backlog
-        // var backlogStore = Ext.create('Rally.data.WsapiDataStore', {
-        //     model: 'Defect',
         var backlogStore = Ext.create('Rally.data.WsapiArtifactStore', {
             models: ['Defect', 'UserStory'],
             autoLoad: false,
-            // sorters: [{
-            //     property: 'Rank',
-            //     direction: 'ASC'
-            // }]
+            sorters: [{
+                property: 'Rank',
+                direction: 'ASC'
+            }]
         });
-        
-        // var backlogArtifactStore = Ext.create('Rally.data.WsapiArtifactStore', {
-        //     models: ['Defect', 'UserStory'],
-        //     autoLoad: false,
-        //     sorters: [{
-        //         property: 'Rank',
-        //         direction: 'ASC'
-        //     }]
-        // });
 
         var filters = [{
             property: 'Release',
@@ -390,14 +388,6 @@ Ext.define('CustomApp', {
             hideIteration: true,
             title: 'Backlog'
         });
-        
-        // backlogArtifactStore.filter(filters);
-
-        // var backlogArtifactGrid = Ext.create('Boost.rally.PrintGrid', {
-        //     store: backlogArtifactStore,
-        //     hideIteration: true,
-        //     title: 'Backlog All'
-        // });
 
         var tab = Ext.create('Ext.tab.Panel', {
             activeTab: 0,

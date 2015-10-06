@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title>Work Item Printer</title>
+        <link href="print.css?1444137515820" rel="stylesheet" type="text/css" media="screen,print">
+    </head>
+    <body class="landscape">
+        <div class="artifact">
+            <div class="ratio-control">
+                <div class="card-frame">
+                    <div class="header hierarchicalrequirement"><span class="storyID ">US10890</span><span class="ownerText ">Lisa Allen</span></div>
+                    <div class="estimate hierarchicalrequirement">8</div>
+                    <div class="content">
+                        <div class="card-title ">Payroll Exception Report  - Additional Requirements</div>
+                        <div class="description ">
+                            <br>As a payroll user I want some changes to the payroll exception report (see US7429) so that some exceptions that weren't specified correctly are amended and become meaningful.<br><br><br>Many changes were made to the exception report on US7429 the following were not specified but picked up in the acceptance review of US7429 and need to be addressed:<br>
+                            <ul>
+                                <li>1.<span class="rally-rte-class-05cddb844">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>–
+                                    item 11. The label is currently “Employees whose salary is maximum” this has not changed and was not specified to be changed. However I noticed it doesn’t make much sense and should really read “Employees whose salary is over maximum”.
+                                    We are not amending this before the deployment. Label should be changed
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>2.<span class="rally-rte-class-05cddb844">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&nbsp;– item 12. Where an employee has both salary and hourly payments. The employee appears on the report with the message to clearly indicate
+                                    why, however the values in the maximum and unit columns aren’t very meaningful and it’s quite hard to make them so. Therefore we will not address this before deployment. Values should be removed
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>3.<span class="rally-rte-class-05cddb844">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>- Item 15 the check for statutory payments – this doesn’t include ShPP. It wasn’t specified in this US and therefore won’t be addressed before
+                                    deployment. ShPP needs to be included and ASPP removed
+                                </li>
+                            </ul>
+                            <ul>
+                                <li>4.<span class="rally-rte-class-05cddb844">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>- Item 21 tax rebate check – this works only on employees with tax code with a suffix of L. This was previously agreed with you and therefore
+                                    this won’t be changed before deployment. It should be changed to just add an employee that has a tax rebate.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <span class="rank ">#1</span>
+                </div>
+            </div>
+        </div>
+        <div class=""></div>
+    </body>
+</html>
