@@ -199,7 +199,6 @@ Ext.define('Boost.rally.PrintGrid', {
             data = self._sanitizeData(selections),
             fieldsForm = self.fieldsForm,
             formValues = fieldsForm.getValues();
-            console.log();
 
         var tpl = new Ext.XTemplate(
             '<tpl for="artifacts">',
@@ -225,9 +224,7 @@ Ext.define('Boost.rally.PrintGrid', {
             '</tpl>', {
                 compiled: true,
                 hideElements: (function(element, field) {
-                    // var val = formValues['iteration-' + element];
                     return formValues['iteration-' + element] ? '' : 'hidden';
-                    // return (!!val && val != null) ? '' : 'hidden';
                 })
             }
         );
@@ -309,7 +306,7 @@ Ext.define('Boost.rally.PrintGrid', {
         doc.close();
 
         win.focus();
-        // win.print();
+        win.print();
         return false;
     })
 });
@@ -336,7 +333,6 @@ Ext.define('CustomApp', {
         // User stories
         var userStoriesGrid = Ext.create('Boost.rally.PrintGrid', {
             store: Ext.create('Rally.data.WsapiDataStore', {
-                // model: ['Defect', 'User Story'],
                 model: 'User Story',
                 autoLoad: false,
                 sorters: [{
@@ -350,7 +346,6 @@ Ext.define('CustomApp', {
         // Defects
         var defectsGrid = Ext.create('Boost.rally.PrintGrid', {
             store: Ext.create('Rally.data.WsapiDataStore', {
-                // model: ['Defect', 'User Story'],
                 model: 'Defect',
                 autoLoad: false,
                 sorters: [{
